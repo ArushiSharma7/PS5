@@ -22,12 +22,18 @@ ui <- fluidPage(
     tabPanel("Airbnb",
              sidebarLayout(
                sidebarPanel(
-                 h1("Greater Seattle Airbnb listings"),
+                 h1("Greater Seattle Airbnb Listings"),
                  p("This dataset shows ", 
-                   strong("airbnb listings from around Greater Seattle.")),
+                   strong("Airbnb listings from around Greater Seattle.")),
                  p("This data allows us to ",
                    em("explore the real estate market "),
-                   "in our city."),
+                   "in our city. It's important for travelers to understand 
+                   their different accomodation options and plan according to
+                   their budget, as well as have the ability to find a place to
+                   stay that meets their quality expectations. This visualization
+                   explores cities like Redmond, Seattle, and Kirkland, providing 
+                   information on their list prices, number of listings, and customer
+                   reviews."),
                  p("The dataset contains ", ncol(airbnb), "variables."),
                  p("Here is a small sample of data: ")
                ),
@@ -45,15 +51,21 @@ ui <- fluidPage(
     tabPanel("Plot",
              
              
-             p("We have", nrow(airbnb), "listings"),
+            
              sidebarLayout(
                sidebarPanel(
-                 sliderInput("n","How many airbnb listings ",
+                 sliderInput("n","How many Airbnb listings? ",
                              min = 1,
                              max = nrow(airbnb),
                              value = 200),
-                 p("For the selected satisfaction level(s), there are ",textOutput(outputId = "result", inline=T),
-                   "listings"),
+                 p("We have", nrow(airbnb), "listings total. The number of past customer
+                   reviews can tell you about the popularity of a particular listing.
+                   More reviews may mean that a particular listing has experienced
+                   hosts, and that customers are satisfied with their experience."),
+                 p("There are ",textOutput(outputId = "result", inline=T),
+                   "listings currently being filtered, and all N/A values have been
+                   removed. The listings for your 
+                   selected satisfaction levels are shown to the right."),
                  fluidRow(
                    column(6,
                           radioButtons("color","Choose color",
@@ -78,10 +90,14 @@ ui <- fluidPage(
              
     ),
     tabPanel("Table",
-             p("See average airbnb cost per city"),
+      
              sidebarLayout(
                sidebarPanel(
                  selectInput("cityName","City", choices = unique(airbnb$address)),
+                 p("It's important to pick where you'll stay based on your unique 
+                   budget. With many wonderful cities in the Greater Seattle
+                   area with Airbnb listings at various price points, several are
+                   sure to meet your needs!"),
                  p("For the selected city, the average price", textOutput(outputId = "aboveBelow", inline=T),
                    "the average room price of $125."),
                  fluidRow(
@@ -138,8 +154,10 @@ server <- function(input, output) {
   
   
   output$checkboxSatisfaction <- renderUI({
+    satisf <- airbnb %>% 
+      filter(!is.na(overall_satisfaction)) 
     checkboxGroupInput("satisfaction","Choose customer satisfaction level",
-                       choices = unique(airbnb$overall_satisfaction)
+                       choices = unique(satisf$overall_satisfaction)
     )
   })
   
@@ -168,7 +186,7 @@ server <- function(input, output) {
     p <- sample() %>%
       ggplot(aes (price, reviews))+
       geom_point(col=input$color)+
-      labs(x = "Airbnb List Prices", y = "Number of Reviews", title= "Comparing Price and Reviews")
+      labs(x = "Airbnb List Prices", y = "Number of Reviews", title= "The Number of Reviews vs. Airbnb List Prices")
     
     
     if(nrow(sample())==0){
